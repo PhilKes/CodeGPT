@@ -33,12 +33,16 @@ public class LlamaSettings implements PersistentStateComponent<LlamaSettingsStat
   }
 
   /**
-   * Code Completions enabled in settings and a model with InfillPromptTemplate selected.
+   * A model with InfillPromptTemplate is selected when running a local server
+   * or an InfillPromptTemplate is selected when using a remote server.
    */
   public static boolean isCodeCompletionsPossible() {
-    return getInstance().getState().isCodeCompletionsEnabled()
-            && LlamaModel.findByHuggingFaceModel(getInstance().getState().getHuggingFaceModel())
-                    .getInfillPromptTemplate() != null;
+    LlamaSettingsState state = getInstance().getState();
+    if (state.isRunLocalServer()) {
+      return LlamaModel.findByHuggingFaceModel(state.getHuggingFaceModel())
+          .getInfillPromptTemplate() != null;
+    }
+    return state.getRemoteModelInfillPromptTemplate() != null;
   }
 
   public static LlamaSettings getInstance() {
